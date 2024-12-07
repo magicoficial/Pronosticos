@@ -1,44 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas de Fútbol</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            text-align: center;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            font-size: 18px; /* Ajusta el tamaño aquí */
-        }
-        #wg-api-football-standings {
-            margin: 20px auto;
-            max-width: 800px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas de Fútbol</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>🎁 Clasificación y Estadísticas</h1>
-    
-    <!-- Widget de API-Football -->
-    <div id="wg-api-football-standings"
-    data-host="v3.football.api-sports.io"
-    data-key="aac1a9ebd9025f38f5704f8b753884ea"
-    data-league="140"
-    data-team=""
-    data-season="2022"
-    data-theme=""
-    data-show-errors="false"
-    data-show-logos="true"
-    class="wg_loader">
-</div>
-<script
-    type="module"
-    src="https://widgets.api-sports.io/2.0.3/widgets.js">
-    </script>
+  <header>
+    <h1>Estadísticas de Partidos</h1>
+  </header>
+
+  <main>
+    <section id="estadisticas">
+      <h2>Partidos Recientes (Premier League)</h2>
+      <table id="tabla-partidos">
+        <thead>
+          <tr>
+            <th>Equipo Local</th>
+            <th>Equipo Visitante</th>
+            <th>Goles Local</th>
+            <th>Goles Visitante</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aquí se insertarán los datos dinámicamente -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Estadísticas de Fútbol</p>
+  </footer>
+
+  <script>
+    const apiKey = 'TU_CLAVE_API'; // Reemplaza con tu API Key
+    const url = 'https://api.football-data.org/v2/competitions/PL/matches'; // Premier League
+
+    // Llamada a la API
+    fetch(url, {
+      headers: { 'X-Auth-Token': apiKey }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la solicitud: ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const partidos = data.matches;
+      const tbody = document.querySelector('#tabla-partidos tbody');
+
+      partidos.forEach(partido => {
+        const fila = document.createElement('tr');
+
+        // Equipos
+        const equipoLocal = document.createElement('td');
+        equipoLocal.textContent = partido.homeTeam.name;
+
+        const equipoVisitante = document.createElement('td');
+        equipoVisitante.textContent = partido.awayTeam.name;
+
+        // Goles
+        const golesLocal = document.createElement('td');
+        golesLocal.textContent = partido.score.fullTime.homeTeam !== null ? partido.score.fullTime.homeTeam : '-';
+
+        const golesVisitante = document.createElement('td');
+        golesVisitante.textContent = partido.score.fullTime.awayTeam !== null ? partido.score.fullTime.awayTeam : '-';
+
+        // Fecha
+        const fecha = document.createElement('td');
+        fecha.textContent = new Date(partido.utcDate).toLocaleDateString();
+
+        // Agregar celdas a la fila
+        fila.appendChild(equipoLocal);
+        fila.appendChild(equipoVisitante);
+        fila.appendChild(golesLocal);
+        fila.appendChild(golesVisitante);
+        fila.appendChild(fecha);
+
+        // Agregar fila a la tabla
+        tbody.appendChild(fila);
+      });
+    })
+    .catch(error => console.error('Error:', error));
+  </script>
 </body>
 </html>
